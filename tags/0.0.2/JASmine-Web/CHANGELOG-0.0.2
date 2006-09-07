@@ -1,0 +1,73 @@
+ JASmine, print accounting system for Cups.
+   Copyright (C) 2005  Nayco.
+
+ (Please read the COPYING file)
+
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License
+ as published by the Free Software Foundation; either version 2
+ of the License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ 
+ CHANGELOG FOR JASmine-Web-0.0.2
+
+* 30-09-2005: 
+  - Now display the print job's originating print server in
+    libJasReports.php:jas_getUserLastJobs; this allows to
+    monitor more than one print server with only one JASmine
+    instance.
+* 03-10-2005
+  - Added a favicon. It sux. Gotta change it.
+  - Added the copyright and GNU/GPL notices to all files
+* 05-10-2005
+  - Added the "error reporting" styles in the CSS file, but
+    they need a good polish.
+* 14-10-2005
+  - Added detection of MySQL support for PHP: If this lacks,
+    JASmine-Web now displays an error message before die()ing.
+  - Changed the <title> of the index page from french to
+    english ;)
+* 24-10-2005
+  - Moved all images to the images/ folder.
+* 28-10-2005
+  - Bill Gates is 50 years old today.
+  - Rewritten the css file, JASmine-Web looks a little bit
+    better now. Made another version for IE, and added a
+    conditionnal statement in header.php to select the sheet
+    automatically. The IE version is still crappy, I'll
+    rework it later.
+  - The user job log now displays the printer by which the
+    job was printed. But now the table becomes unreadable, so
+    removing fields will be necessary.
+  - Added printer stats (show_printer.php) and related
+    functions in libJasReports.php.
+* 01-11-2005
+  - Reworked the stylesheet again. NOW it is nice !
+  - Added a printer stylesheet, but there is still a
+    long way to go to get it right.
+  - Added the GNU GPL notice to the stylesheets; But I'm
+    wondering wether I should use a CC By-SA license for
+    art files ?
+* 02-11-2005
+  - Now IE and old browsers have a decent stylesheet.
+  - Cleaned the "compliant browsers" stylesheet.
+* 06-11-2005
+  - Created 'libTables.php' to handle html tables. This
+    library will be extended later to support sorting, etc...
+  - Replaced calls to DB_dump_result() in libJasReports by
+    calls to libTables' functions. This way reports will
+    be enhanced in the future.
+* 07-11-2005
+  - Talking about enhancements, moving libJasReports to
+    use libTable enabled me to display links instead of
+    printer and user names in the reports tables. Clicking
+    on those links displays user or printer stats ! This
+    way, JASmine-Web becomes more easy to use.

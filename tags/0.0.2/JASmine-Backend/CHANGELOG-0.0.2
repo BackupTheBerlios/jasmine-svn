@@ -1,0 +1,63 @@
+ JASmine, print accounting system for Cups.
+   Copyright (C) 2005  Nayco.
+
+ (Please read the COPYING file)
+
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License
+ as published by the Free Software Foundation; either version 2
+ of the License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+Changelog for JASmine-Backend-0.0.2
+
+* 30-09-2005:
+  - Added support for the database's new 'server' field;
+    this allows to monitor more than one print server with
+    only one JASmine instance.
+  - Made various changes to switch from "pdl_analyser" to
+    "pkpgcounter".
+
+* 19-10-2005
+  - Added a dummy printer backend, to test JASmine without
+    actually printing anything: Paper and toner are not
+    cheap ;) !!! It is located in the bin/ directory of
+    the tarball: Copy it to your Cups backend folder to
+    use it, and reload Cups.
+  - Redirected pkpgcounter's STDERR output to /dev/null
+    when analyzing a file, to prevent wrong interpretation
+    by JASmine-backend when an info or error message is
+    written.
+* 21-10-2005
+  - Modified the logging section to use 'warning' syslog
+    priority instead of deprecated 'err'.
+  - Added calls to openlog() on exits, this is more clean.
+  - Added the log_debug() function and a $debug variable
+    to activate debug messages only when needed (Typically
+    during setup phase).
+  - Modified most log_failure() and log_success()
+    calls to be log_debug ones. The only log_success() used
+    is to report the success of a print job: Now, when in
+    production, JASmine-Backend will be less verbose.
+  - Added a verbose die() when syslog support is wanted
+    but the Sys::Syslog perl module is not installed.
+  - Made the "dummy" backend more portable by using the
+    "which" command.
+  - Modified the "dummy" backend's output to match Cups
+    specifications. ("local" => "direct")
+* 23-10-2005
+  - Modified the "dummy" backend to log debug info with
+    user.debug priority.
+  - Checking that Pkpgcounter is executable is not useful
+    anymore: Removed the corresponding code from JASmine-
+    Backend.
+  - JASmine-Backend now logs a message when Cups calls it
+    for reloading.

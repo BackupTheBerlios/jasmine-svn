@@ -1,0 +1,194 @@
+body {
+  font-family: sans-serif;
+  font-size: 12px;
+}
+h1,h2,h3,h4,h5,h6 {
+  color: #999999;
+}
+/*h2{
+  background: url("logo_h.png") center left no-repeat;
+  padding-left: 26px;
+}*/
+div.header{
+  border: dashed 1px #999999;
+  background: url("logo.png") center left no-repeat;
+  margin: 0px;
+  padding-left: 100px;
+  height: 50px;
+  overflow: hidden;
+}
+div.header h1{
+  font-family: cursive;
+  font-size: 40px;
+  padding-left: 0.2em;
+  margin: 0px;
+  margin-bottom: -0.5em;
+}
+div.header p{
+  margin: 0px;
+  padding-left: 5em;
+}
+div.menu{
+  padding: 2px 2px 2px 2px;
+  height: 1.5em;
+  background-color: #F5F5F5;
+  border-bottom: #999999 1px solid;
+}
+div.menu h2 {
+  display: none;
+}
+div.menu a{
+  text-decoration: none;
+  color: #999999;
+}
+div.menu hr{
+  margin: 0 0 -1px 7px;
+  height: 1px;
+  border: none;
+  background: #999999;
+}
+/* For IE */
+div.menu a:hover {
+  color: #5dc081;
+}
+div.menu ul {
+  border: 1px solid #999999;
+  background: #FFFFFF;
+  list-style: none;
+  width: 15em;
+  margin: 1em;
+  padding: 0.3em 1em 0.3em 1em;
+}
+div.menu ul ul {
+  border: none;
+  margin: 0;
+  padding: 0 1em 0 1em;
+}
+/* For css2 compliant browsers*/
+div.menu li:hover> a{
+  color: #5dc081;
+}
+div.menu > ul {
+  border: none;
+  width: auto;
+  background: transparent;
+  padding: 2px;
+  display: inline;
+  margin: 0px;
+}
+div.menu > ul > li {
+  position: relative;
+  cursor: pointer;
+  color: #999999;
+  padding: 0px 4px 0px 4px;
+  margin: 2px;
+  text-align: center;
+  display: inline;
+}
+div.menu > ul > li:hover {
+  border: solid 1px #5dc081;
+  background: #CCFFEE;
+  margin: 1px;
+  color: #5dc081;
+}
+div.menu ul > li > ul {
+  border: 1px solid #999999;
+  position: absolute;
+  background: white;
+  list-style: none;
+  display: none;
+  top: 1.2em;
+  left: 0.1em;
+  z-index: 2;
+  margin: auto;
+  padding: 0px;
+  width: 15em;;
+}
+div.menu ul > li > ul > li {
+  padding: 2px 2px 2px 7px;
+  text-align: left;
+}
+div.menu > ul > li:hover > ul {
+  display: block;
+  left: 0;
+  padding: 1px;  
+}
+div.menu > ul > li > ul > li:hover {
+  border: solid 1px #5dc081;
+  /*#7ddca1;*/
+  background: #CCFFEE;
+  padding: 1px 1px 1px 6px;
+}
+
+
+div.auth{
+  display: none;
+}
+
+div.report_page{
+/* Bug de mozilla: Commenter pour corriger */
+/*  overflow: auto;*/
+
+}
+div.report_page p{
+  padding-left: 25px;
+}
+table{
+  border: solid 1px #5dc081;
+  margin-left: 50px;
+  margin-right: auto;
+  width: 75%;
+  border-collapse: collapse;
+}
+caption{
+  font-size: 80%;
+  margin-left: 50px;
+  caption-side: bottom; 
+  width: auto;
+  text-align: left;
+  padding-left: 1em;
+}
+th {
+  border: none;
+  background: #CCFFEE;
+  width: 1em;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+th + th{
+  width: auto;
+}
+tr:hover {
+  background: #CCFFEE;
+}
+td {
+  border: solid 1px #5dc081;
+  text-align: left;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+td + td, th +td{
+  text-align: right;
+}
+
+a:link, a:visited {
+  text-decoration: none;
+  color: #999999;
+}
+a:hover, a:active {
+  color: #5dc081;
+}
+
+/* footer */
+.footerinc{
+  clear: both;
+  text-align: center;
+}
+.footerinc a img {
+  opacity: 0.5;
+  border: none;
+}
+.footerinc a:hover img {
+  opacity: 1;
+  border: none;
+}

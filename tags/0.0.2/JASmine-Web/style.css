@@ -1,0 +1,262 @@
+/* JASmine, print accounting system for Cups.
+ Copyright (C) 2005  Nayco.
+
+ (Please read the COPYING file)
+
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License
+ as published by the Free Software Foundation; either version 2
+ of the License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. */
+
+/* Style.css: Stylesheet for Web-Standards compliant browsers */
+
+body {
+  font-family: sans-serif;
+  font-size: 12px;
+  background: #FFFFFF url("images/JasmineFlower.jpg");
+  background-position: 0 0;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+a:link, a:visited {
+  text-decoration: none;
+  color: #666666;
+}
+a:hover, a:active {
+  color: #66CC99;
+}
+
+h1,h2,h3,h4,h5,h6 {
+  color: #999999;
+}
+input, fieldset {
+  border: 1px solid #999999;
+  background: #FFFFFF;
+  /* Non standards-compliant, but nice */
+  -moz-border-radius: 5px;
+}
+input {
+  padding:2px;
+}
+input:hover, input:focus {
+  border: 1px solid #66CC99;
+}
+fieldset {
+  margin: 1em 0 1em 0;
+}
+div.header{
+  margin: 0px;
+  text-align: right;
+  height: 50px;
+  overflow: hidden;
+}
+div.header h1{
+  font-family: cursive;
+  font-size: 220%;
+  padding: 0;
+  margin: 0;
+}
+div.header p{
+  margin: -0.5em 0 0 0;
+  padding: 0;
+}
+
+/* Menu block */
+div.menu{
+  background-color: #FFFFFF;
+  border: #999999 1px solid;
+  height: 2em;
+/* 0.3em to try to vertical-align center. Damn, I hate this hack ! */
+  padding: 0.3em 0 0 0;
+  background: url("images/JasmineFlowerGlass.jpg");
+  background-position: 0 0;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+div.menu h2 {
+  display: none;
+}
+div.menu > ul {
+  list-style-type: none;
+  padding: 0;
+  cursor: pointer;
+  margin: 0 0 0 1em;
+}
+div.menu > ul > li {
+  float: left;
+}
+div.menu > ul > li span {
+  margin: 1px;
+  padding: 0px 10px 0px 10px;
+  color: #666666;
+}
+div.menu > ul > li:hover span {
+  margin: 0px;
+  padding: 0px 10px 0px 10px;
+  border: solid 1px #66CC99;
+  background: #66CC99;
+  color: #FFFFFF;
+}
+div.menu > ul > li > ul {
+  border: 1px solid #999999;
+  border-right: 1px solid #000000;
+  border-bottom: 1px solid #000000;
+  margin: 0px;
+  margin-left: 2px;
+  margin-top: -1px;
+  padding: 0px;
+  padding-left: 1em;
+  width: 12em;
+  background: #CCCCCC;
+  list-style-type: none;
+  position: absolute;
+/* This is a nice alternative to "display: none", as old
+   Opera versions can't handle it properly */
+  left: -999em;
+}
+div.menu > ul > li:hover > ul {
+  left: auto;
+}
+div.menu ul > li > ul > li {
+  margin: 0px;
+  padding: 1px;
+  background: white;
+}
+div.menu ul > li > ul > li a:link, div.menu ul > li > ul > li a:visited, div.menu ul > li > ul > li a:active {
+  color: #666666;
+  display: block;
+  margin: 1px;
+  padding: 1px 10px 1px 10px;
+}
+div.menu > ul > li > ul > li a:hover {
+  margin: 0px;
+  color: #FFFFFF; 
+  border: solid 1px #66CC99;
+  background: #66CC99;
+}
+
+/* Auth box */
+div.auth{
+  display: none;
+}
+
+/* main block */
+div.report_page{
+  margin: 2em;
+  padding: 1em;
+  border-left: 1px dashed #CCCCCC;
+  border-top: 1px dashed #CCCCCC;
+  background: url("images/JasmineFlowerGlass.jpg");
+  background-position: 0 0;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+div.report_page p{
+  padding-left: 25px;
+}
+div.report_page h2 {
+  text-align: center;
+}
+
+/* Tables */
+table{
+  border: solid 1px #66CC99;
+  margin-left: auto;
+  margin-right: auto;
+  width: 85%;
+}
+table a:link, table a:visited {
+  color: #999999;
+  display: block;
+}
+table a:active, table a:hover {
+  color: #66CC99;
+}
+caption{
+  font-size: 80%;
+  padding-top: 0.5em;
+  margin-left: auto;
+  margin-right: auto;
+  caption-side: bottom; 
+  text-align: right;
+}
+th {
+  border: 1px solid #FFFFFF;
+  background: #66CC99;
+  color: #FFFFFF;
+  padding: 2px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+th + th{
+  width: auto;
+}
+tr:hover {
+  background: #CCFFCC;
+}
+td {
+  border: none;
+  text-align: left;
+  padding: 2px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+td + td, th +td{
+  text-align: right;
+}
+
+/* Error reporting */
+div.error_block {
+  padding: 1em;
+  background: #FFFFFF;
+}
+div.error_block h2 {
+  border-bottom: 1px solid black;
+  color: black;
+}
+div.error_block h3 {
+  color: #FF6666;
+}
+div.error_block dl{
+  border: 1px solid #FF6666;
+  padding: 1em;
+  background: #FFCCCC;
+}
+div.error_block dt {
+  color: gray;
+}
+div.error_block dt strong{
+  text-decoration: underline;
+  color: black;
+}
+div.error_block dd {
+  font-style: italic;
+  margin-bottom: 1em;
+}
+
+/* footer */
+.footerinc{
+  clear: both;
+  text-align: center;
+}
+.footerinc a img {
+  opacity: 0.5;
+  border: none;
+}
+.footerinc a:hover img {
+  opacity: 1;
+  border: none;
+}
+.footerinc hr {
+/* hide it for now */
+  display: none;
+}

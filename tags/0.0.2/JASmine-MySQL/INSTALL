@@ -1,0 +1,33 @@
+
+Jasmine-MySQL Installation
+
+This is the installation procedure for Jasmine-MySQL. More
+information and (Maybe ;-)) user feedback can be found at
+http://nayco.free.fr/ (Look for "jasmine" in the page). Both
+french and english documentations are there, as well as php
+api docs.
+
+/* Example names: I used here 'jasmine' as MySQL user, 'sql_password'
+as password, 'print' for the database name and 'mysql.here.com'
+for the host. */
+
+1- Create a database named for example 'print', on your MySQL
+server, using the MySQL admin credentials:
+$ mysql -h mysql.here.com -u sql_admin_login -p sql_admin_password
+mysql> CREATE DATABASE print;
+
+2- Create a MySQL user, for example 'jasmine'. Grant this user
+ALL rights on the print database:
+mysql> GRANT ALL ON print.* TO jasmine@CUPS_SERVER IDENTIFIED BY 'sql_password';
+mysql> FLUSH PRIVILEGES;
+
+3- Run the sql file into your database server, using the
+'jasmine' user credentials:
+# mysql -h mysql.here.com -u sql_login -p sql_password print < jasmine.sql
+
+That's all. You may use a tool like Mysqlcc (http://mysql.com) to manage
+your database easily...
+
+NOTE : If you're upgrading from 0.0.1, you may want to keep your
+       data; just use an ALTER statement like this :
+       mysql> ALTER jobs_log ADD server tinytext NOT NULL;

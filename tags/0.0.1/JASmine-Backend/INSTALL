@@ -1,0 +1,66 @@
+
+Intalling Jasmine-backend
+
+This is the installation procedure for Jasmine-backend. More
+information and (Maybe ;-)) user feedback can be found at
+http://nayco.free.fr/ (Look for "jasmine" in the page). Both
+french and english documentations are there, as well as php
+api docs.
+
+Ok, go on:
+
+* Pdl_analyser.py installation
+
+  This file is located in the directory 'pdl_analyser/'. It is part
+  of the 'PyKota' print accounting project, much more advanced than
+  mine, and is developped by Jerome Alet.
+
+  1- Copy "pdl_analyser.py" in a directory of your choice, typically
+     /usr/bin. Chown it '944' to 'root'. There is no need to make it
+     executable.
+  2- Ensure that you have Ghostscript installed, and the executable
+     'gs' is in root's $PATH. This should be the case in most distros,
+     like Mandriva and Ubuntu.
+  3- Check that Python is installed. The version I use is Python2.3,
+     feel free to try with other versions... Usually, the Python
+     executable is located in /usr/bin/python.
+
+* Backend installation
+
+  1- Copy the perl script 'jasmine' into Cups's backend directory
+     (Usually '/usr/lib/cups/backend', like in Mandriva and Ubuntu),
+     and chown it '755' to 'root'.
+  2- Check that you have Perl 5.8 installed (By default in Mandriva
+     and Ubuntu), and that the perl executable is locate at
+     '/usr/bin/perl'.
+  4- You’ll need the DBI and MySQL perl modules installed (
+     'urpmi perl-DBI perl-mysql' with Mandriva, and 'sudo apt-get
+     install libdbd-mysql-perl' with Ubuntu)
+  5- Do not forget to run the sql script into your MySQL server ! See
+     the INSTALL file in the 'Jasmine-MySQL' archive.
+  6- Modify the JASmine backend by editing the variables at the
+     beginning of the file: Make the variables point to the right paths,
+     specify the MySQL password, login, host and database.
+     --
+     my $DBhost="mysql.here.com";
+     my $DBlogin="jasmine";
+     my $DBpassword="sql_passowrd";
+     my $DBdatabase="print";
+     #
+     # If you want to use Syslog, set this to 1. Should be used for
+     # debugging, not in production... To disable, set 0.
+     my $Want_Sys_Syslog=1;
+     #
+     # Location of the Python binary and Pykota's analyzer.
+     my $path_to_pldanalyser="/usr/bin/pdl_analyser.py";
+     my $path_to_python="/usr/bin/python";
+     --
+  7- Reload Cups, connect to 'http://cups_server:631', use this inteface
+     to setup a new printer. Be sure to choose '....(Quota managed)' for
+     the driver (URI beginning with 'jasmine:...") ! Then print something
+     on this printer and look at the 'jobs_log' table in the database to
+     see if the number of pages is logged... Do not forget to check Cups's
+     logs and your syslog to find about errors.
+  8- Install 'Jasmine-Web', and play with it ;-).
+
+That's all !

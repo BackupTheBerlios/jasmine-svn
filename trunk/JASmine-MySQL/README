@@ -1,0 +1,25 @@
+====================================
+ JASmine, print accounting for Cups
+
+     (c) 2005 Nayco <nayco@free.fr>
+====================================
+
+This is JASmine version 0.0.2. This code is in early
+developpement state, so do not expect for miracles !
+
+However, it already accounts prints jobs and stores
+the results to a MySQL database, and displays simple
+reports on a web page; but sometimes (often ;)) these
+results are not accurate, so do not use these reports
+for print billing !!!
+
+Anyway, feel free to report bugs, send comments or
+feature requests to me (nayco@free.fr).
+
+Be sure to read the INSTALL file to setup correctly
+this software.
+
+This software is FREE SOFTWARE, released under the
+terms of GNU GPL, read the LICENCE file for more info.
+
+Enjoy !

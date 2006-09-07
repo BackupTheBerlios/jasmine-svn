@@ -1,0 +1,14 @@
+<?php
+  // config.php: global variables and parameters.
+
+  // Various vars
+  $DEFAULT_STARTPAGE="summary";
+
+  // Database vars
+  $DB_host="MYSQL_SERVER";
+  $DB_login="MYSQL_USER";
+  $DB_pass="MYSQL_PASSWORD";
+
+  $DB_db="print";
+
+?>
