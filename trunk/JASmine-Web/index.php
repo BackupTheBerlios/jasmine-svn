@@ -27,7 +27,14 @@
   include_once("libError.php");
   include_once("header.php");
   include_once("menu.php");
-  
+
+  if (!file_exists("config.php")){
+    $message="Config file not found !";
+    $hint="Don't forget to copy \"config.php.dist\" to \"config.php\", then edit ";
+    $hint.="it to suit your needs.";
+    ER_Handler::getInstance()->logCrit("No Config file", $message, $hint);
+  }
+
 ?>    <div class="report_page">
 <?php
   // Include a file to fill the main body of the page, based on the $_GET[section] variable.
