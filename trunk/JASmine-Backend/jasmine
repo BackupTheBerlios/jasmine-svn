@@ -37,8 +37,8 @@ use DBD::mysql; #<= WORK ON THISSSSSSSss !!!!!
 # account, database and table on your MySQL server
 my $DBhost="jasmine";
 my $DBlogin="jasmine";
-my $DBpassword="impression";
-my $DBdatabase="print";
+my $DBpassword="jasmine";
+my $DBdatabase="jasmine";
 
 # If you want to use Syslog, set this to 1. To disable, set to 0.
 my $Want_Sys_Syslog=1;

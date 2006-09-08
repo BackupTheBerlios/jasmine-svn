@@ -21,7 +21,8 @@ Ok, go on:
      # urpmi python
 
   2- Pkpgcounter installation
-    You can use pkpgcounter's installer (Recommended, but you will need python-devel),
+    You can use pkpgcounter's installer (Recommended, but you will need python-devel
+    with some distros - Mandriva 10.1, for example, but not Mandriva 2006.0...),
     or do it manually :
 
     * Manual installation : All you need it to copy pkpgcounter and its
@@ -36,7 +37,7 @@ Ok, go on:
 
     * Using the installer :
       # cd pkpgcounter-1.72
-      # urpmi python-devel (or apt-get...)
+      # urpmi python-devel (or apt-get... Do this only if "python setup..." fails)
       # urpmi python-imaging
       # python setup.py install
 
@@ -57,7 +58,7 @@ Ok, go on:
      '/usr/bin/perl'.
 
   4-  You'll need the DBI and MySQL perl modules installed (
-     'urpmi perl-DBI perl-mysql' with Mandriva 10.1, and 'sudo
+     'urpmi perl-DBI perl-DBD-mysql' with Mandriva 2006.0, and 'sudo
      apt-get install libdbd-mysql-perl' with Ubuntu 5.04)
 
   5-  Do not forget to run the sql script into your MySQL server ! See
