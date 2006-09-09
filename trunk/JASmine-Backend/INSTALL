@@ -29,13 +29,15 @@ Ok, go on:
       libraries to the right place; X.X is your Python version (Python2.4 on
       Mandriva 2006.0)
       # urpmi python-imaging
-      # cd pkpgcounter-1.72
+      # tar xfzv pkpgcounter-VERSION.tar.gz
+      # cd pkpgcounter-VERSION
       # cp -r pkpgpdls /usr/lib/pythonX.X/site-packages/
       # cp bin/pkpgcounter /usr/bin
 
       Take care of the owner and permissions !!!
 
     * Using the installer :
+      # tar xfzv pkpgcounter-VERSION.tar.gz
       # cd pkpgcounter-1.72
       # urpmi python-devel (or apt-get... Do this only if "python setup..." fails)
       # urpmi python-imaging
