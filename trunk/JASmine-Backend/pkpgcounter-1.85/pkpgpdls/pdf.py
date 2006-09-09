@@ -18,8 +18,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
-# $Id: pdf.py 122 2006-01-17 21:55:50Z jerome $
+# $Id: pdf.py 206 2006-09-05 21:44:49Z jerome $
 #
+
+"""This modules implements a page counter for PDF documents."""
 
 import sys
 import re
@@ -40,16 +42,17 @@ class PDFObject :
         
 class Parser(pdlparser.PDLParser) :
     """A parser for PDF documents."""
+    totiffcommand = 'gs -sDEVICE=tiff24nc -dPARANOIDSAFER -dNOPAUSE -dBATCH -dQUIET -r%(dpi)i -sOutputFile="%(fname)s" -'
     def isValid(self) :    
-        """Returns 1 if data is PDF, else 0."""
+        """Returns True if data is PDF, else False."""
         if self.firstblock.startswith("%PDF-") or \
            self.firstblock.startswith("\033%-12345X%PDF-") or \
            ((self.firstblock[:128].find("\033%-12345X") != -1) and (self.firstblock.upper().find("LANGUAGE=PDF") != -1)) or \
            (self.firstblock.find("%PDF-") != -1) :
             self.logdebug("DEBUG: Input file is in the PDF format.")
-            return 1
+            return True
         else :    
-            return 0
+            return False
         
     def getJobSize(self) :    
         """Counts pages in a PDF document."""
@@ -57,7 +60,6 @@ class Parser(pdlparser.PDLParser) :
         lastcomment = None
         objects = {}
         inobject = 0
-        # objre = re.compile(r"\s*(\d+)\s+(\d+)\s+obj[<\s/]*")
         objre = re.compile(r"\s?(\d+)\s+(\d+)\s+obj[<\s/]?")
         for fullline in self.infile.xreadlines() :
             parts = [ l.strip() for l in fullline.splitlines() ]
@@ -71,7 +73,7 @@ class Parser(pdlparser.PDLParser) :
                     # New object begins here
                     result = objre.search(line)
                     if result is not None :
-                        (major, minor) = map(int, line[result.start():result.end()].split()[:2])
+                        (major, minor) = [int(num) for num in line[result.start():result.end()].split()[:2]]
                         obj = PDFObject(major, minor, lastcomment)
                         obj.content.append(line[result.end():])
                         inobject = 1
@@ -93,17 +95,13 @@ class Parser(pdlparser.PDLParser) :
                             obj.content.append(line)
                         
         # Now we check each PDF object we've just created.
-        self.iscolor = None
+        # colorregexp = re.compile(r"(/ColorSpace) ?(/DeviceRGB|/DeviceCMYK)[/ \t\r\n]", re.I)
         newpageregexp = re.compile(r"(/Type)\s?(/Page)[/\s]", re.I)
-        colorregexp = re.compile(r"(/ColorSpace) ?(/DeviceRGB|/DeviceCMYK)[/ \t\r\n]", re.I)
         pagecount = 0
         for obj in objects.values() :
             content = "".join(obj.content)
             count = len(newpageregexp.findall(content))
             pagecount += count
-            if colorregexp.match(content) :
-                self.iscolor = 1
-                self.logdebug("ColorSpace : %s" % content)
         return pagecount    
         
 def test() :        

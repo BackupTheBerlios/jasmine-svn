@@ -18,8 +18,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
-# $Id: pclxl.py 139 2006-02-10 10:24:07Z jerome $
+# $Id: pclxl.py 206 2006-09-05 21:44:49Z jerome $
 #
+
+"""This modules implements a page counter for PCLXL (aka PCL6) documents."""
 
 import sys
 import os
@@ -31,6 +33,7 @@ import pjl
 
 class Parser(pdlparser.PDLParser) :
     """A parser for PCLXL (aka PCL6) documents."""
+    totiffcommand = 'pcl6 -sDEVICE=pdfwrite -dPARANOIDSAFER -dNOPAUSE -dBATCH -dQUIET -sOutputFile=- - | gs -sDEVICE=tiff24nc -dPARANOIDSAFER -dNOPAUSE -dBATCH -dQUIET -r%(dpi)i -sOutputFile="%(fname)s" -'
     mediasizes = { 
                     0 : "Letter",
                     1 : "Legal",
@@ -77,15 +80,15 @@ class Parser(pdlparser.PDLParser) :
                    }
             
     def isValid(self) :    
-        """Returns 1 if data is PCLXL aka PCL6, else 0."""
+        """Returns True if data is PCLXL aka PCL6, else False."""
         if ((self.firstblock[:128].find("\033%-12345X") != -1) and \
              (self.firstblock.find(" HP-PCL XL;") != -1) and \
              ((self.firstblock.find("LANGUAGE=PCLXL") != -1) or \
               (self.firstblock.find("LANGUAGE = PCLXL") != -1))) :
             self.logdebug("DEBUG: Input file is in the PCLXL (aka PCL6) format.")
-            return 1
+            return True
         else :    
-            return 0
+            return False
             
     def beginPage(self, nextpos) :
         """Indicates the beginning of a new page, and extracts media information."""
@@ -356,7 +359,7 @@ class Parser(pdlparser.PDLParser) :
         
         self.tags[0x1b] = self.escape # The escape code
         
-        self.tags[0x21]= self.skipKyoceraPrescribe # 0x21 is not normally used
+        self.tags[0x21] = self.skipKyoceraPrescribe # 0x21 is not normally used
         
         # GhostScript's sources tell us that HP printers
         # only accept little endianness, but we can handle both.

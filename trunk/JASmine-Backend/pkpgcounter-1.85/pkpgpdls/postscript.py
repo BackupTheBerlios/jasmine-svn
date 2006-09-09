@@ -18,8 +18,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
-# $Id: postscript.py 153 2006-02-17 13:09:04Z jerome $
+# $Id: postscript.py 206 2006-09-05 21:44:49Z jerome $
 #
+
+"""This modules implements a page counter for PostScript documents."""
 
 import sys
 import os
@@ -31,8 +33,9 @@ import inkcoverage
 
 class Parser(pdlparser.PDLParser) :
     """A parser for PostScript documents."""
+    totiffcommand = 'gs -sDEVICE=tiff24nc -dPARANOIDSAFER -dNOPAUSE -dBATCH -dQUIET -r%(dpi)i -sOutputFile="%(fname)s" -'
     def isValid(self) :    
-        """Returns 1 if data is PostScript, else 0."""
+        """Returns True if data is PostScript, else False."""
         if self.firstblock.startswith("%!") or \
            self.firstblock.startswith("\004%!") or \
            self.firstblock.startswith("\033%-12345X%!PS") or \
@@ -42,9 +45,9 @@ class Parser(pdlparser.PDLParser) :
               (self.firstblock.find("LANGUAGE = Postscript") != -1))) or \
               (self.firstblock.find("%!PS-Adobe") != -1) :
             self.logdebug("DEBUG: Input file is in the PostScript format.")
-            return 1
+            return True
         else :    
-            return 0
+            return False
         
     def throughGhostScript(self) :
         """Get the count through GhostScript, useful for non-DSC compliant PS files."""
@@ -164,51 +167,19 @@ class Parser(pdlparser.PDLParser) :
             pagecount += (copies - 1)
             self.logdebug("%s * page #%s" % (copies, pnum))
         self.logdebug("Internal parser said : %s pages" % pagecount)
-        
-        if notrust :    
-            pagecount = 0 # Let gs do counting
-        return pagecount
+        return (pagecount, notrust)
         
     def getJobSize(self) :    
         """Count pages in PostScript document."""
         self.copies = 1
-        return self.natively() or self.throughGhostScript()
-        
-    def throughTiffMultiPage24NC(self, dpi) :
-        """Converts the input file to TIFF format, X dpi, 24 bits per pixel, uncompressed.
-           Returns percents of ink coverage and number of pages.
-        """   
-        self.logdebug("Converting input datas to TIFF...")
-        result = None    
-        self.infile.seek(0)
-        (handle, filename) = tempfile.mkstemp(".tmp", "pkpgcounter")    
-        os.close(handle)
-        command = 'gs -sDEVICE=tiff24nc -dPARANOIDSAFER -dNOPAUSE -dBATCH -dQUIET -r%i -sOutputFile="%s" -' % (dpi, filename)
-        try :
-            child = popen2.Popen4(command)
+        (nbpages, notrust) = self.natively()
+        newnbpages = nbpages
+        if notrust :
             try :
-                data = self.infile.read(pdlparser.MEGABYTE)    
-                while data :
-                    child.tochild.write(data)
-                    data = self.infile.read(pdlparser.MEGABYTE)
-                child.tochild.flush()
-                child.tochild.close()    
-            except (IOError, OSError), msg :    
-                raise pdlparser.PDLParserError, "Problem during conversion to TIFF : %s" % msg
-                
-            child.fromchild.close()
-            try :
-                child.wait()
-            except OSError, msg :    
-                raise pdlparser.PDLParserError, "Problem during conversion to TIFF : %s" % msg
-                
-            result = inkcoverage.getPercents(filename)    
-        finally :    
-            try :
-                os.remove(filename)
-            except :    
-                pass
-        return result    
+                newnbpages = self.throughGhostScript()
+            except pdlparser.PDLParserError, msg :
+                self.logdebug(msg)
+        return max(nbpages, newnbpages)    
         
 def test() :        
     """Test function."""

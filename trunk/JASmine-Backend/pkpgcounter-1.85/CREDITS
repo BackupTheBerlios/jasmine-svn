@@ -1,4 +1,4 @@
-# $Id: CREDITS 122 2006-01-17 21:55:50Z jerome $
+# $Id: CREDITS 205 2006-09-05 21:36:18Z jerome $
 
 pkpgcounter : a generic Page Description Language parser
 
@@ -23,7 +23,14 @@ The following people helped the pkpgcounter project :
   
   
   - Eduardo Gielamo Oliveira & Rodolfo Broco Manin : initial PCL parser.
+  
   - Valcir C. Vargas : helped on PCL3GUI support.
+  
+  - Daniel Franklin : pkpgcounter's algorithm for the computation 
+    of ink coverage comes from Daniel's PrintBill project.
+    
+  - Aurélien Croc : reverse engineered Samsung QPDL and published  
+                    a language specification.
 
 
 ==============================================================

@@ -18,7 +18,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
-# $Id: pkpgcounter 150 2006-02-16 14:42:11Z jerome $
+# $Id: pkpgcounter 205 2006-09-05 21:36:18Z jerome $
 #
 #
 
@@ -34,6 +34,9 @@ pkpgcounter is a generic Page Description Language parser.
 pkpgcounter parses any number of input files and/or its standard input
 and outputs the number of pages needed to print these documents.
 
+pkpgcounter can also compute the percent of ink coverage in different
+colorspaces for several file formats.
+
 pkpgcounter currently recognizes the following document formats :
 
     * PostScript (both DSC compliant and binary)
@@ -43,8 +46,12 @@ pkpgcounter currently recognizes the following document formats :
     * DVI
     * TIFF
     * ESC/P2
-    * OpenDocument (OpenOffice.org)
+    * OpenDocument (ISO/IEC DIS 26300)
     * Zenographics ZjStream
+    * Samsung QPDL (aka SPL2)
+
+The four latter ones, as well as some TIFF documents, are currently 
+only supported in page counting mode. 
 
 command line usage :
 
@@ -52,10 +59,20 @@ command line usage :
 
 options :
 
-  -v | --version       Prints pkpgcounter's version number then exits.
-  -h | --help          Prints this message then exits.
+  -v | --version        Prints pkpgcounter's version number then exits.
+  -h | --help           Prints this message then exits.
   
-  -d | --debug         Activate debug mode. 
+  -d | --debug          Activate debug mode. 
+  
+  -cCOLORSPACE, --colorspace=COLORSPACE
+                        Activate the computation of ink usage, and defines the
+                        colorspace to use. Supported values are 'BW', 'RGB',
+                        'CMYK', and 'CMY'.
+                        
+  -rRESOLUTION, --resolution=RESOLUTION
+                        The resolution in DPI to use when checking ink usage.
+                        Lower resolution is faster but less accurate. Default
+                        is 72 dpi.
   
 examples :                              
 
@@ -64,6 +81,11 @@ examples :
   Will launch pkpgcounter and will output the total number of pages
   needed to print all the documents specified.
   
+  $ pkpgcounter --colorspace bw --resolution 150 file1.ps
+  
+  Will output the percent of black ink needed on each page of
+  the file1.ps file rendered at 150 dpi.
+  
 %(__gplblurb__)s  
 
 Please e-mail bugs to: %(__authoremail__)s"""
@@ -71,8 +93,6 @@ Please e-mail bugs to: %(__authoremail__)s"""
 if __name__ == "__main__" : 
     if (len(sys.argv) >= 2) and (sys.argv[1] in ("-h", "--help")) :
         print __doc__ % globals()
-    elif (len(sys.argv) >= 2) and (sys.argv[1] in ("-v", "--version")) :
-        print __version__
     else :    
         analyzer.main()
 

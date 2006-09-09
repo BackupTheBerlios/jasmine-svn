@@ -18,8 +18,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
-# $Id: zjstream.py 148 2006-02-16 14:00:58Z jerome $
+# $Id: zjstream.py 206 2006-09-05 21:44:49Z jerome $
 #
+
+"""This modules implements a page counter for ZjStream documents."""
 
 import sys
 import os
@@ -31,17 +33,17 @@ import pdlparser
 class Parser(pdlparser.PDLParser) :
     """A parser for ZjStream documents."""
     def isValid(self) :    
-        """Returns 1 if data is ZjStream, else 0."""
+        """Returns True if data is ZjStream, else False."""
         if self.firstblock[:4] == "ZJZJ" :
             self.logdebug("DEBUG: Input file is in the Zenographics ZjStream (little endian) format.")
             self.littleEndian()
-            return 1
+            return True
         elif self.firstblock[:4] == "JZJZ" :    
             self.logdebug("DEBUG: Input file is in the Zenographics ZjStream (big endian) format.")
             self.bigEndian()
-            return 1
+            return True
         else :    
-            return 0
+            return False
         
     def littleEndian(self) :
         """Toggles to little endianness."""
@@ -98,7 +100,7 @@ class Parser(pdlparser.PDLParser) :
             minfile.close()
             
         if startpagecount != endpagecount :    
-            sys.stderr.write("ERROR : Incorrect ZjStream datas.\n")
+            sys.stderr.write("ERROR: Incorrect ZjStream datas.\n")
         return max(startpagecount, endpagecount)
         
 def test() :        

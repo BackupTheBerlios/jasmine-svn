@@ -18,8 +18,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
-# $Id: pjl.py 122 2006-01-17 21:55:50Z jerome $
+# $Id: pjl.py 176 2006-08-13 23:06:38Z jerome $
 #
+
+"""This modules implements a really minimalist PJL parser."""
 
 import sys
 

@@ -16,10 +16,13 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
-# $Id: version.py 158 2006-06-08 13:43:03Z jerome $
+# $Id: version.py 206 2006-09-05 21:44:49Z jerome $
 #
 
-__version__ = "1.82"
+"""This modules defines some important constants used in this software."""
+
+
+__version__ = "1.85"
 
 __doc__ = """pkpgcounter : a generic Page Description Languages parser."""
 

@@ -18,8 +18,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
-# $Id: tiff.py 122 2006-01-17 21:55:50Z jerome $
+# $Id: tiff.py 206 2006-09-05 21:44:49Z jerome $
 #
+
+"""This modules implements a page counter for TIFF documents."""
 
 import sys
 import os
@@ -30,15 +32,16 @@ import pdlparser
 
 class Parser(pdlparser.PDLParser) :
     """A parser for TIFF documents."""
+    totiffcommand = "cat >%(fname)s"
     def isValid(self) :        
-        """Returns 1 if data is TIFF, else 0."""
+        """Returns True if data is TIFF, else False."""
         littleendian = (chr(0x49)*2) + chr(0x2a) + chr(0)
         bigendian = (chr(0x4d)*2) + chr(0) + chr(0x2a)
         if self.firstblock[:4] in (littleendian, bigendian) :
             self.logdebug("DEBUG: Input file is in the TIFF format.")
-            return 1
+            return True
         else :    
-            return 0
+            return False
     
     def getJobSize(self) :
         """Counts pages in a TIFF document.
@@ -57,9 +60,11 @@ class Parser(pdlparser.PDLParser) :
         if minfile[:4] == littleendian :
             integerbyteorder = "<I"
             shortbyteorder = "<H"
-        else :    
+        elif minfile[:4] == bigendian :
             integerbyteorder = ">I"
             shortbyteorder = ">H"
+        else :    
+            raise pdlparser.PDLParserError, "Unknown file endianness."
         pos = 4    
         try :    
             nextifdoffset = unpack(integerbyteorder, minfile[pos : pos + 4])[0]

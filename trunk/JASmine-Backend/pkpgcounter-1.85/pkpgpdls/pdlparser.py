@@ -16,10 +16,13 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
-# $Id: pdlparser.py 122 2006-01-17 21:55:50Z jerome $
+# $Id: pdlparser.py 206 2006-09-05 21:44:49Z jerome $
 #
 
+"""This module defines the base class for all Page Description Language parsers."""
+
 import sys
+import popen2
 
 KILOBYTE = 1024    
 MEGABYTE = 1024 * KILOBYTE    
@@ -37,6 +40,7 @@ class PDLParserError(Exception):
         
 class PDLParser :
     """Generic PDL parser."""
+    totiffcommand = None        # Default command to convert to TIFF
     def __init__(self, infile, debug=0, firstblock=None, lastblock=None) :
         """Initialize the generic parser."""
         self.infile = infile
@@ -73,9 +77,35 @@ class PDLParser :
             sys.stderr.write("%s\n" % message)
             
     def isValid(self) :    
-        """Returns 1 if data is in the expected format, else 0."""
+        """Returns True if data is in the expected format, else False."""
         raise RuntimeError, "Not implemented !"
         
     def getJobSize(self) :    
         """Counts pages in a document."""
         raise RuntimeError, "Not implemented !"
+        
+    def convertToTiffMultiPage24NC(self, fname, dpi) :
+        """Converts the input file to TIFF format, X dpi, 24 bits per pixel, uncompressed.
+           Writes TIFF datas to the file named by fname.
+        """   
+        if self.totiffcommand :
+            child = popen2.Popen4(self.totiffcommand % locals())
+            try :
+                try :
+                    data = self.infile.read(MEGABYTE)    
+                    while data :
+                        child.tochild.write(data)
+                        data = self.infile.read(MEGABYTE)
+                    child.tochild.flush()
+                    child.tochild.close()    
+                except (IOError, OSError), msg :    
+                    raise PDLParserError, "Problem during conversion to TIFF : %s" % msg
+            finally :    
+                child.fromchild.close()
+                
+            try :
+                child.wait()
+            except OSError, msg :    
+                raise PDLParserError, "Problem during conversion to TIFF : %s" % msg
+        else :        
+            raise PDLParserError, "Impossible to compute ink coverage for this file format."

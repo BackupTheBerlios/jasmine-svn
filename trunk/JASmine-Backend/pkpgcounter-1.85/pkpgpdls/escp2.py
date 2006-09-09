@@ -18,8 +18,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
-# $Id: escp2.py 122 2006-01-17 21:55:50Z jerome $
+# $Id: escp2.py 206 2006-09-05 21:44:49Z jerome $
 #
+
+"""This modules implements a page counter for ESC/P2 documents."""
 
 import sys
 
@@ -28,15 +30,15 @@ import pdlparser
 class Parser(pdlparser.PDLParser) :
     """A parser for ESC/P2 documents."""
     def isValid(self) :        
-        """Returns 1 if data is ESC/P2, else 0."""
+        """Returns True if data is ESC/P2, else False."""
         if self.firstblock.startswith("\033@") or \
            self.firstblock.startswith("\033*") or \
            self.firstblock.startswith("\n\033@") or \
            self.firstblock.startswith("\0\0\0\033\1@EJL") : # ESC/P Raster ??? Seen on Stylus Photo 1284
             self.logdebug("DEBUG: Input file is in the ESC/P2 format.")
-            return 1
+            return True
         else :    
-            return 0
+            return False
             
     def getJobSize(self) :    
         """Counts pages in an ESC/P2 document."""

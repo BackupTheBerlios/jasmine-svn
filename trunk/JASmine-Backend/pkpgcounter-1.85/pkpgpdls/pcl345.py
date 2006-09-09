@@ -18,8 +18,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
-# $Id: pcl345.py 158 2006-06-08 13:43:03Z jerome $
+# $Id: pcl345.py 206 2006-09-05 21:44:49Z jerome $
 #
+
+"""This modules implements a page counter for PCL3/4/5 documents."""
 
 import sys
 import os
@@ -31,6 +33,7 @@ import pjl
 
 class Parser(pdlparser.PDLParser) :
     """A parser for PCL3, PCL4, PCL5 documents."""
+    totiffcommand = 'pcl6 -sDEVICE=pdfwrite -dPARANOIDSAFER -dNOPAUSE -dBATCH -dQUIET -sOutputFile=- - | gs -sDEVICE=tiff24nc -dPARANOIDSAFER -dNOPAUSE -dBATCH -dQUIET -r%(dpi)i -sOutputFile="%(fname)s" -'
     mediasizes = {  # ESC&l####A
                     0 : "Default",
                     1 : "Executive",
@@ -80,17 +83,17 @@ class Parser(pdlparser.PDLParser) :
                    }
         
     def isValid(self) :    
-        """Returns 1 if data is PCL, else 0."""
+        """Returns True if data is PCL3/4/5, else False."""
         if self.firstblock.startswith("\033E\033") or \
            (self.firstblock.startswith("\033*rbC") and (not self.lastblock[-3:] == "\f\033@")) or \
            self.firstblock.startswith("\033%8\033") or \
            (self.firstblock.find("\033%-12345X") != -1) or \
-           self.firstblock.find("@PJL ENTER LANGUAGE=PCL\012\015\033") or \
+           (self.firstblock.find("@PJL ENTER LANGUAGE=PCL\012\015\033") != -1) or \
            (self.firstblock.startswith(chr(0xcd)+chr(0xca)) and self.firstblock.find("\033E\033")) :
             self.logdebug("DEBUG: Input file is in the PCL3/4/5 format.")
-            return 1
+            return True
         else :    
-            return 0
+            return False
         
     def setPageDict(self, pages, number, attribute, value) :
         """Initializes a page dictionnary."""

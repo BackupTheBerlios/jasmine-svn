@@ -18,57 +18,49 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
-# $Id: dvi.py 122 2006-01-17 21:55:50Z jerome $
+# $Id: ooo.py 206 2006-09-05 21:44:49Z jerome $
 #
 
+"""This modules implements a page counter for OpenDocument documents."""
+
 import sys
-import os
-import mmap
-from struct import unpack
+import zipfile
 
 import pdlparser
 
 class Parser(pdlparser.PDLParser) :
-    """A parser for DVI documents."""
+    """A parser for OpenOffice.org documents."""
     def isValid(self) :        
-        """Returns 1 if data is DVI, else 0."""
-        try :
-            if (ord(self.firstblock[0]) == 0xf7) and (ord(self.lastblock[-1]) == 0xdf) :
-                self.logdebug("DEBUG: Input file is in the DVI format.")
-                return 1
-            else :    
-                return 0
-        except IndexError :          
-            return 0
+        """Returns True if data is OpenDocument, else False."""
+        if self.firstblock[:2] == "PK" :
+            try :
+                self.archive = zipfile.ZipFile(self.infile)
+                self.contentxml = self.archive.read("content.xml")
+                self.metaxml = self.archive.read("meta.xml")
+            except :    
+                return False
+            else :
+                self.logdebug("DEBUG: Input file is in the OpenDocument (ISO/IEC DIS 26300) format.")
+                return True
+        else :    
+            return False
             
     def getJobSize(self) :
-        """Counts pages in a DVI document.
+        """Counts pages in an OpenOffice.org document.
         
            Algorithm by Jerome Alet.
-           
-           The documentation used for this was :
-         
-           http://www.math.umd.edu/~asnowden/comp-cont/dvi.html
         """
-        infileno = self.infile.fileno()
-        minfile = mmap.mmap(infileno, os.fstat(infileno)[6], prot=mmap.PROT_READ, flags=mmap.MAP_SHARED)
         pagecount = 0
-        pos = -1
-        eofchar = chr(0xdf)
-        postchar = chr(0xf8)
         try :
-            while minfile[pos] == eofchar :
-                pos -= 1
-            idbyte = minfile[pos]    
-            if idbyte != minfile[1] :
-                raise IndexError, "Invalid DVI file."
-            pos = unpack(">I", minfile[pos - 4:pos])[0]
-            if minfile[pos] != postchar :
-                raise IndexError, "Invalid DVI file."
-            pagecount = unpack(">H", minfile[pos + 27: pos + 29])[0]
-        except IndexError : # EOF ?
-            pass
-        minfile.close() # reached EOF
+            # First try with Text documents
+            index = self.metaxml.index("meta:page-count=")
+            pagecount = int(self.metaxml[index:].split('"')[1])
+        except :
+            # Now try with Impress documents
+            pagecount = self.contentxml.count("<draw:page ")
+            if not pagecount :
+                # Probably a Spreadsheet document
+                raise pdlparser.PDLParserError, "OpenOffice.org's spreadsheet documents are not yet supported."
         return pagecount
         
 def test() :        
