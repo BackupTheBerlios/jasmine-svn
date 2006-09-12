@@ -21,16 +21,7 @@
 
 # Version : 27-08-2006
 
-use strict;
-#use Data::Dumper;
-use POSIX qw(strftime);
-use File::Basename;
-use Sys::Hostname;
-#use DBI;
-use DBD::mysql; #<= WORK ON THISSSSSSSss !!!!!
-
 # Variables
-
 # => Edit the following to suit your needs:
 
 # MySQL server related stuff: You have to create the corresponding
@@ -42,9 +33,13 @@ my $DBdatabase="jasmine";
 
 # If you want to use Syslog, set this to 1. To disable, set to 0.
 my $Want_Sys_Syslog=1;
-# Should be used for debugging or setup phase, not in
-# production... To disable, set to 0.
-my $Debug_Mode=1;
+
+# Debug mode : Should be used only for debugging or setup phase,
+# and not in production... Set to 0 when everything works fine.
+#   0 : Use this in production, debug disabled
+#   1 : Installation/configuration phase.
+#   2 : For developers only, will fill your harddrive with tempfiles !
+my $Debug_Mode=2;
 
 # Location of the python and pkpgcounter binaries
 my $path_to_pkpgcounter="/usr/bin/pkpgcounter";
@@ -54,6 +49,14 @@ my $path_to_python="/usr/bin/python";
 ##
 ## /!\ NOTHING TO EDIT UNDER THIS LINE !!! /!\
 ##
+
+use strict;
+#use Data::Dumper;
+use POSIX qw(strftime);
+use File::Basename;
+use Sys::Hostname;
+#use DBI;
+use DBD::mysql; #<= WORK ON THISSSSSSSss !!!!!
 
 # Backend-related variables: Should not be changed if working !
 my $backends_dir = dirname($0);
@@ -318,7 +321,7 @@ if (@ARGV == 0){
   unlink $lockfile or log_failure ("Unable to remove file '$lockfile'");
 
   # Log success
-  log_failure("Reload successful.");
+  log_success("Reload successful.");
 
   # Clean and exit
   closelog();
@@ -327,8 +330,8 @@ if (@ARGV == 0){
 
 # OK, back to the main part of the script; We saw what needed to be done when
 # called without argument. Now, when Cups has finished its init, it only calls
-# us with 6 or 7 arguments. If there are 7, we gotta read the file to print
-# ourselves from the given path. If only 6 are given, the file is sent by STDIN.
+# us with 5 or 6 arguments. If there are 6, we gotta read the file to print
+# ourselves from the given path. If only 5 are given, the file is sent by STDIN.
 else {
   log_debug ("---> Print job started at ".strftime ("%a %b %e %H:%M:%S %Y", localtime));
   log_debug ("  Command line: $0");
@@ -353,9 +356,9 @@ else {
   # If we were called with 5 arguments, read from STDIN to a tempfile:
   if (@ARGV == 5){
     my $tmpcmd = "/bin/mktemp </dev/null ".$ENV{"TMPDIR"}."/print.XXXXXX";
-    $tmpfile = `$tmpcmd`;
+    $tmpfile = qx{$tmpcmd};
     chomp $tmpfile;
-    `cat > $tmpfile`;
+    qx{cat > $tmpfile};
 
     # ...And set $tmpfile to be the document to print
     $doc = $tmpfile;
@@ -432,7 +435,7 @@ else {
     my $dbh = DBI->connect($dsn, $DBlogin, $DBpassword) or log_failure ("  Couldn't connect to the MySQL server !");
 		
     # Escape the fields to be inserted
-		my @sqlArgs=map($dbh->quote($_), ($job_id, $printer,$user, $hostname, $title, $copies, $pg_count, $options, $doc));
+    my @sqlArgs=map($dbh->quote($_), ($job_id, $printer,$user, $hostname, $title, $copies, $pg_count, $options, $doc));
 		
     my $query="INSERT INTO jobs_log (date, job_id, printer, user, server, title, copies,pages, options, doc)";
     $query.=" VALUES (now(), ".join (", ", @sqlArgs).")";
@@ -459,14 +462,25 @@ else {
   }
 
   # Soldiers, clean this mess and get out of here ! But, if a count or DB failure
-  # occured AND we are in debug mode, do not delete the tempfile so one can
-  # examine it.
+  # occured AND we are in developer mode, do not delete the tempfile so one can
+  # examine it. If there was no tempfile, grab a copy of the document for the same
+  # reasons.
   if ($count_failure) {
     log_failure(" Accounting failure : Whether the page accounting or the DB insert failed !");
-    if ($Debug_Mode && defined $tmpfile) {
+    if (($Debug_Mode > 1) && defined $tmpfile) {
+      # Developer mode activated, and tempfile exists : Keep it !
       log_debug("Warning, tempfile not removed to enable investigation. Please clean $ENV{TMPDIR} manually !!!");
     }
+    elsif (($Debug_Mode > 1) && ! defined $tmpfile) {
+      # Developer mode activated, and the document already existed : 
+      # Grab a copy and save it with tempfiles. This may be improved
+      # by generating a random filename... Well, it's for developers
+      # anyway.
+      log_debug("Warning, saved document as a tempfile to enable investigation. Please clean $ENV{TMPDIR} manually !!!");
+      qx/cp $doc $ENV{"TMPDIR"}/;
+    }
     else {
+      # Developer mode not activated, kill the tempfile.
       unlink $tmpfile if (defined $tmpfile);
     }
   }
