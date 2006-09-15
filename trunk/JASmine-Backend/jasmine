@@ -54,6 +54,7 @@ use strict;
 #use Data::Dumper;
 use POSIX qw(strftime);
 use File::Basename;
+use File::Copy;
 use Sys::Hostname;
 #use DBI;
 use DBD::mysql; #<= WORK ON THISSSSSSSss !!!!!
@@ -152,9 +153,12 @@ else{
 # be turned off when going to production. We use log_failure()
 # here to be sure the admin gets the message, as DEBUG priority
 # is often filtered by the logging system.
-if ($Debug_Mode){
-  log_failure ("Warning: Debug mode is activated, you should turn it off when going to production ! To do so, set \$debug to 0 in the $backends_dir/$me perl script.");
-}
+log_failure ("Warning: Debug mode is activated, you should turn it off
+when going to production ! To do so, set \$Debug_Mode to 0
+in the $backends_dir/$me perl script.") if ($Debug_Mode);
+
+log_failure ("Warning: Debug mode is set to 2, your '/var' partition may
+be full in a near future...") if ($Debug_Mode == 2);
 
 sub count_pages {
   # This function returns an estimation of the number of pages
@@ -172,24 +176,24 @@ sub count_pages {
   # or not executable, warn the admin !
   if ( ! -e $path_to_pkpgcounter){
     log_failure ("  Analyzer not found: Check that you installed $path_to_pkpgcounter");
-    return -1;
+    $count_failure = 1;
   }
 
   ## Was this really useful ?
   #if ( ! -x $path_to_pkpgcounter){
   #  log_failure ("  Analyzer is not executable: Check that you've chmod'ed +x $path_to_pkpgcounter");
-  #  return -1;
+  #  $count_failure = 1;
   #}
 
   # Same thing for the Python executable...
   if ( ! -e $path_to_python){
     log_failure ("  Python not found: Check that you installed $path_to_python");
-    return -1;
+    $count_failure = 1;
   }
 
   if ( ! -x $path_to_python){
     log_failure ("  Python is not executable: Check that you've chmod'ed +x $path_to_python");
-    return -1;
+    $count_failure = 1;
   }
 
   # This command will analyze our print job.
@@ -207,7 +211,6 @@ sub count_pages {
     log_debug ("  Analyzer returned: " . $crcode);
     log_debug ("  Analyzing successful !") unless ($crcode != 0);
     log_debug ("  Number of pages: $total_pages");
-    return $total_pages;
   }
   else{
     # We weren't able to analyze the document...
@@ -216,11 +219,22 @@ sub count_pages {
     log_debug ("  Analyzer core dumped ? : ". ($rcode & 128));
     log_failure ("  Couldn't analyze the document; Return code: ".$rcode);
 
-    # Prevent deletion of the temp file for future investigation.
+    # Inform the rest of the script that cointing failed. For example,
+    # this will prevent deletion of the temp file to enable future
+    # investigations.
     $count_failure = 1;
+  }
 
-    # Return -1 so the failure appears in the database.
-    return -1;
+  # If counting the pages failed in either way, return 0 so the failure
+  # appears in the database without affecting the stats. Remember that
+  # $count_failure is a global variable, it will be used again at the
+  # bottom of this script.
+  if ($count_failure) {
+    return 0;
+  }
+  # If all went fine, simply return the number of pages.
+  else {
+    return $total_pages;
   }
 }
 
@@ -355,9 +369,11 @@ else {
 
   # If we were called with 5 arguments, read from STDIN to a tempfile:
   if (@ARGV == 5){
+    # TODO : This is not portable, use File::Temp instead !
     my $tmpcmd = "/bin/mktemp </dev/null ".$ENV{"TMPDIR"}."/print.XXXXXX";
     $tmpfile = qx{$tmpcmd};
     chomp $tmpfile;
+    # TODO : This is not portable too !
     qx{cat > $tmpfile};
 
     # ...And set $tmpfile to be the document to print
@@ -461,34 +477,41 @@ else {
     # for now. Instead, as a problem occured, we keep the temps file (See below)
   }
 
-  # Soldiers, clean this mess and get out of here ! But, if a count or DB failure
-  # occured AND we are in developer mode, do not delete the tempfile so one can
-  # examine it. If there was no tempfile, grab a copy of the document for the same
-  # reasons.
-  if ($count_failure) {
-    log_failure(" Accounting failure : Whether the page accounting or the DB insert failed !");
-    if (($Debug_Mode > 1) && defined $tmpfile) {
-      # Developer mode activated, and tempfile exists : Keep it !
+  # Soldiers, clean this mess and get out of here ! But, if we are in developer
+  # mode ($Debug_Mode >= 2), do not delete the tempfiles so one can examine it.
+  # Then 2 solutions :
+  #   - If we are running with 5 arguments, we received the document through
+  #   STDIN so we already have a copy in $ENV{"TMPDIR"} : We just have to avoid
+  #   deleting it.
+  #   - If we are running with 6 arguments, the tempfile was already created by
+  #   CUPS and we received its path a the 6th arg. We just need to grab a copy
+  #   of it before CUPS deletes it.
+  #   
+  # Anyway, if counting the pages or inserting the result in the DB failed, we
+  # always warn the sysadmin. Moreover, if in debug mode ($Debug_Mode = 1), we
+  # need to keep a copy of the document as seen before.
+  if ($Debug_Mode > 1) {
+    # Developer mode : Keep all files inconditionally
+    log_debug("Warning, developer mode on, tempfile not removed to enable investigation. Please clean $ENV{TMPDIR} manually !!!");
+    copy($doc,$ENV{"TMPDIR"}) if ($doc);
+    $count_failure and log_failure(" Accounting failure : Whether the page accounting or the DB insert failed !");
+  }
+  elsif ($Debug_Mode == 1) {
+    # Simple debug mode : Keep file only if an error occured
+    if ($count_failure) {
+      log_failure(" Accounting failure : Whether the page accounting or the DB insert failed !");
       log_debug("Warning, tempfile not removed to enable investigation. Please clean $ENV{TMPDIR} manually !!!");
-    }
-    elsif (($Debug_Mode > 1) && ! defined $tmpfile) {
-      # Developer mode activated, and the document already existed : 
-      # Grab a copy and save it with tempfiles. This may be improved
-      # by generating a random filename... Well, it's for developers
-      # anyway.
-      log_debug("Warning, saved document as a tempfile to enable investigation. Please clean $ENV{TMPDIR} manually !!!");
-      qx/cp $doc $ENV{"TMPDIR"}/;
+      copy($doc,$ENV{"TMPDIR"}) if ($doc);
     }
     else {
-      # Developer mode not activated, kill the tempfile.
       unlink $tmpfile if (defined $tmpfile);
     }
   }
-  # So, if there was no error, clean
   else {
     unlink $tmpfile if (defined $tmpfile);
   }
 
+  # Close log...
   log_debug ("---> Ended at: ".strftime ("%a %b %e %H:%M:%S %Y", localtime));
   closelog ();
   exit 0;
