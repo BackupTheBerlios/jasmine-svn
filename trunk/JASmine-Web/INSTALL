@@ -3,9 +3,9 @@ Jasmine-Web Installation
 
 This is the installation procedure for Jasmine-Web. More
 information and (Maybe ;-)) user feedback can be found at
-http://nayco.free.fr/ (Look for "jasmine" in the page). Both
-french and english documentations are there, as well as php
-api docs.
+  http://jasmine.berlios.de/
+English documentation is there too.
+
 
 1- Put the content of all this archive in a directory under
    the DocumentRoot of your web server. Example:

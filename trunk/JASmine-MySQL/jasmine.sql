@@ -1,5 +1,5 @@
 -- JASmine, print accounting system for Cups.
--- Copyright (C) 2005  Nayco.
+-- Copyright (C) Nayco.
 --
 -- (Please read the COPYING file)
 --

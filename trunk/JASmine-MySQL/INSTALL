@@ -1,11 +1,10 @@
 
-Jasmine-MySQL Installation
+JASmine-MySQL Installation
 
-This is the installation procedure for Jasmine-MySQL. More
+This is the installation procedure for JASmine-MySQL. More
 information and (Maybe ;-)) user feedback can be found at
-http://nayco.free.fr/ (Look for "jasmine" in the page). Both
-french and english documentations are there, as well as php
-api docs.
+  http://jasmine.berlios.de/
+English documentation is there too.
 
 /* Example names: I used here 'jasmine' as MySQL user, 'sql_password'
 as password, 'print' for the database name and 'mysql.here.com'

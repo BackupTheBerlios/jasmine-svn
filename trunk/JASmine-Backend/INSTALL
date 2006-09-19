@@ -1,11 +1,11 @@
 
-Intalling Jasmine-backend
+Intalling JASmine-Backend
 
-This is the installation procedure for Jasmine-backend. More
+This is the installation procedure for JASmine-Backend. More
 information and (Maybe ;-)) user feedback can be found at
-http://nayco.free.fr/ (Look for "jasmine" in the page). Both
-french and english documentations are there, as well as php
-api docs.
+  http://jasmine.berlios.de/
+English documentation is there too.
+
 
 Ok, go on:
 
@@ -38,7 +38,7 @@ Ok, go on:
 
     * Using the installer :
       # tar xfzv pkpgcounter-VERSION.tar.gz
-      # cd pkpgcounter-1.72
+      # cd pkpgcounter-VERSION
       # urpmi python-devel (or apt-get... Do this only if "python setup..." fails)
       # urpmi python-imaging
       # python setup.py install
@@ -64,7 +64,7 @@ Ok, go on:
      apt-get install libdbd-mysql-perl' with Ubuntu 5.04)
 
   5-  Do not forget to run the sql script into your MySQL server ! See
-     the INSTALL file in the 'Jasmine-MySQL' archive.
+     the INSTALL file in the 'JASmine-MySQL' archive.
 
   6-  Modify the JASmine backend by editing the variables at the
      beginning of the file: Make the variables point to the right paths,
@@ -106,6 +106,6 @@ Ok, go on:
      Do not forget to check Cups's logs and your syslog to find about
      errors.
 
-  8-  Install 'Jasmine-Web', and play with it ;-).
+  8-  Install 'JASmine-Web', and play with it ;-).
 
 That's all !

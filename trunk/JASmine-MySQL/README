@@ -1,10 +1,10 @@
 ====================================
  JASmine, print accounting for Cups
 
-     (c) 2005 Nayco <nayco@free.fr>
+     (c) Nayco
 ====================================
 
-This is JASmine version 0.0.2. This code is in early
+This is JASmine version X.X.X. This code is in early
 developpement state, so do not expect for miracles !
 
 However, it already accounts prints jobs and stores
@@ -14,7 +14,9 @@ results are not accurate, so do not use these reports
 for print billing !!!
 
 Anyway, feel free to report bugs, send comments or
-feature requests to me (nayco@free.fr).
+feature requests on the mailing lists. See
+  http://jasmine.berlios.de
+to know how to subscribe.
 
 Be sure to read the INSTALL file to setup correctly
 this software.

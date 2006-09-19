@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 # JASmine, print accounting system for Cups.
-# Copyright (C) 2005  Nayco.
+# Copyright (C) Nayco.
 #
 # (Please read the COPYING file)
 #
@@ -19,7 +19,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-# Version : 27-08-2006
 
 # Variables
 # => Edit the following to suit your needs:

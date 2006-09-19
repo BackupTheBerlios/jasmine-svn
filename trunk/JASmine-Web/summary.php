@@ -1,6 +1,6 @@
 <?php
 /* JASmine, print accounting system for Cups.
- Copyright (C) 2005  Nayco.
+ Copyright (C) Nayco.
 
  (Please read the COPYING file)
 
@@ -19,8 +19,7 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. */
 
   /* Summary.php: Displays a summary of overall  printing
-     activity.
-       Version: 0-19.05.2005 */
+     activity. */
 
   include_once("libJasReports.php");
 

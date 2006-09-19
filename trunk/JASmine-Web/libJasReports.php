@@ -1,6 +1,6 @@
 <?php
 /* JASmine, print accounting system for Cups.
- Copyright (C) 2005  Nayco.
+ Copyright (C) Nayco.
 
  (Please read the COPYING file)
 
@@ -39,7 +39,7 @@
      it deals with user stats. For working example, well, take a look at
      JASmine-Web's config file ;-)
 
-     Version 0-25.06.2006 */
+*/
 
    include_once("libDB_mysql.php");
    include_once("libError.php");
