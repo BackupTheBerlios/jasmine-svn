@@ -11,24 +11,24 @@ Ok, go on:
 
 * Pkpgcounter installation
 
-  The files are located in the directory 'pkpgcounter-1.72'.
+  The files are located in the 'pkpgcounter-VERSION' tarball.
   Pkpgcounter is part of the 'PyKota' print accounting project,
   much more advanced than mine, and is developped by Jerome
   Alet.
   Warning : Python and Perl are needed !
 
-  1- Install Python. For example, with Mandriva :
-     # urpmi python
+  1- Install Python and the Python Imaging Library (PIL).
+     For example, with Mandriva :
+     # urpmi python python-imaging
 
   2- Pkpgcounter installation
-    You can use pkpgcounter's installer (Recommended, but you will need python-devel
-    with some distros - Mandriva 10.1, for example, but not Mandriva 2006.0...),
+    You can use pkpgcounter's installer (Recommended, but you will
+    need python-devel with some distros - Mandriva, for example),
     or do it manually :
 
     * Manual installation : All you need it to copy pkpgcounter and its
       libraries to the right place; X.X is your Python version (Python2.4 on
       Mandriva 2006.0)
-      # urpmi python-imaging
       # tar xfzv pkpgcounter-VERSION.tar.gz
       # cd pkpgcounter-VERSION
       # cp -r pkpgpdls /usr/lib/pythonX.X/site-packages/
@@ -40,7 +40,6 @@ Ok, go on:
       # tar xfzv pkpgcounter-VERSION.tar.gz
       # cd pkpgcounter-VERSION
       # urpmi python-devel (or apt-get... Do this only if "python setup..." fails)
-      # urpmi python-imaging
       # python setup.py install
 
 * Backend installation
@@ -54,8 +53,9 @@ Ok, go on:
      setting up a new printer as "Really virtual printer for testing
      Cups". It prints nothing, but can be used to try/debug JASmine
      without consuming paper, and it logs useful informations to syslog.
+     Do not forget to chown it '755' to 'root'.
 
-  2-  Check that you have Perl 5.8 installed (By default in Mandriva
+  2-  Check that you have Perl installed (by default in Mandriva
      and Ubuntu), and that the perl executable is located at
      '/usr/bin/perl'.
 
@@ -75,22 +75,17 @@ Ok, go on:
      my $DBlogin="jasmine";
      my $DBpassword="sql_passowrd";
      my $DBdatabase="print";
-     #
-     # If you want to use Syslog, set this to 1. Should be used for
-     # debugging, not in production... To disable, set 0.
+
      my $Want_Sys_Syslog=1;
-     # Should be used for debugging or setup phase, not in
-     # production... To disable, set to 0.
      my $Debug_Mode=1;
 
-     # Location of the python and pkpgcounter binaries
      my $path_to_pkpgcounter="/usr/bin/pkpgcounter";
      my $path_to_python="/usr/bin/python";
      --
 
      You should leave $Debug_Mode to 1 and tail -f your /var/log/syslog
      file(s) while in installation/setup phase. when sure your jobs
-     get accounted for, set $Debug_Mode to 0.
+     get accounted for, set $Debug_Mode to 0 !
 
   7-  Reload Cups, connect to 'http://cups_server:631', use this inteface
      to setup a new printer. Be sure to choose '....(Quota managed)' for

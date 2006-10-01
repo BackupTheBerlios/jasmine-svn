@@ -38,7 +38,7 @@ my $Want_Sys_Syslog=1;
 #   0 : Use this in production, debug disabled
 #   1 : Installation/configuration phase.
 #   2 : For developers only, will fill your harddrive with tempfiles !
-my $Debug_Mode=2;
+my $Debug_Mode=1;
 
 # Location of the python and pkpgcounter binaries
 my $path_to_pkpgcounter="/usr/bin/pkpgcounter";

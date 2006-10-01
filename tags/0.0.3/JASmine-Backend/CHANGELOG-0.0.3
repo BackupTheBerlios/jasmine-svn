@@ -28,13 +28,12 @@ Changelog for JASmine-Backend-0.0.3
     It seems the 'smb' backend had problems with it not set to the
     right value.
 * 10-07-2006
-  - Added quoting on the variables to be inserted in the database. I
+  - Added SQL escaping on the values to be inserted in the database. I
     can't believe I forgot this :-O !
   - Improved MySQL insert error reporting.
   - I did all the above modifications on an old version of the
     file. Pleasures of conflict resolution with "diff" and "patch"
     are going to be mine :-(.
-  - France loses the soccer world cup.
 * 27-08-2006
   - Finally resolved the version conflict.
 * 08-09-2006
@@ -44,10 +43,11 @@ Changelog for JASmine-Backend-0.0.3
   - Pkpgcounter upgraded from 1.82 to 1.85
   - Tested JASmine-Backend with Cups 1.2.3 : Everything is fine.
   - Now pkpgcounter is provided as a tar.gz archive, not a directory.
-    This will ease the use of SVN keywords. (OUAIS, ENFIN BON... PAS CLAIR)
 * 15-09-2006
   - Reworked debug modes, added developer mode.
   - Improved count failure processing. JASmine-Backend no longer records
     '-1' to the database (thus making print stats false), but '0'.
   - Cosmetic changes, added comments.
-
+* 01-10-2006
+  - Preparing for realease : Reviewed copyright notices, READMEs,
+    docs, scripts...
