@@ -18,6 +18,7 @@ mysql> CREATE DATABASE print;
 2- Create a MySQL user, for example 'jasmine'. Grant this user
 ALL rights on the print database:
 mysql> GRANT ALL ON print.* TO jasmine@CUPS_SERVER IDENTIFIED BY 'sql_password';
+mysql> GRANT ALL ON print.* TO jasmine@WEB_SERVER IDENTIFIED BY 'sql_password';
 mysql> FLUSH PRIVILEGES;
 
 3- Run the sql file into your database server, using the
@@ -29,4 +30,4 @@ your database easily...
 
 NOTE : If you're upgrading from 0.0.1, you may want to keep your
        data; just use an ALTER statement like this :
-       mysql> ALTER jobs_log ADD server tinytext NOT NULL;
+       mysql> ALTER TABLE jobs_log ADD server tinytext NOT NULL;
