@@ -1,16 +1,15 @@
 ====================================
  JASmine, print accounting for Cups
-
      (c) Nayco
 ====================================
 
-This is JASmine version X.X.X. This code is in early
+This is JASmine version 0.0.3. This code is in early
 developpement state, so do not expect for miracles !
 
 However, it already accounts prints jobs and stores
 the results to a MySQL database, and displays simple
-reports on a web page; but sometimes (often ;)) these
-results are not accurate, so do not use these reports
+reports on a web page; but sometimes these results 
+may not be accurate, so do not use these reports
 for print billing !!!
 
 Anyway, feel free to report bugs, send comments or

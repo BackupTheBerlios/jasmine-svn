@@ -25,10 +25,10 @@
 
 # MySQL server related stuff: You have to create the corresponding
 # account, database and table on your MySQL server
-my $DBhost="jasmine";
-my $DBlogin="jasmine";
-my $DBpassword="jasmine";
-my $DBdatabase="jasmine";
+my $DBhost="MYSQL_HOST";
+my $DBlogin="MYSQL_LOGIN";
+my $DBpassword="MYSQL_PASS";
+my $DBdatabase="MYSQL_DB";
 
 # If you want to use Syslog, set this to 1. To disable, set to 0.
 my $Want_Sys_Syslog=1;

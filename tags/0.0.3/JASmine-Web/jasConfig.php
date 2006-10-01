@@ -22,7 +22,7 @@
   // should not touch. In fact, this file is to be touched only
   // by developpers. 
 
-  $jas_version="X.X.X";
+  $jas_version="0.0.3";
   
   $jas_printerStatsPage="index.php?section=show_printer&printer=";
   $jas_userStatsPage="index.php?section=show_user&user=";

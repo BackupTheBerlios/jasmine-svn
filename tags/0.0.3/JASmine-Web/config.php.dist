@@ -27,6 +27,5 @@
   $DB_host="MYSQL_SERVER";
   $DB_login="MYSQL_USER";
   $DB_pass="MYSQL_PASSWORD";
-
-  $DB_db="print";
+  $DB_db="MYSQL_DB";
 ?>
