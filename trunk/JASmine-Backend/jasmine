@@ -368,15 +368,14 @@ else {
 
   # If we were called with 5 arguments, read from STDIN to a tempfile:
   if (@ARGV == 5){
-    # TODO : This is not portable, use File::Temp instead !
-    my $tmpcmd = "/bin/mktemp </dev/null ".$ENV{"TMPDIR"}."/print.XXXXXX";
-    $tmpfile = qx{$tmpcmd};
-    chomp $tmpfile;
-    # TODO : This is not portable too !
-    qx{cat > $tmpfile};
+    # TODO : Validate this works, and add some comments !
+    use File::Temp;
+    use File::Copy;
 
-    # ...And set $tmpfile to be the document to print
-    $doc = $tmpfile;
+    my ($tempfh,$doc)=mkstempt("jasmine_XXXXXXXX", $ENV{"TMPDIR"});
+    
+    copy(\*STDIN, $tempfh);
+    
     log_debug ("  Called with 5 args, \$doc is read from STDIN and the tempfile is $doc");
   }
 
