@@ -368,15 +368,26 @@ else {
 
   # If we were called with 5 arguments, read from STDIN to a tempfile:
   if (@ARGV == 5){
-    # TODO : Validate this works, and add some comments !
+    # TODO : Validate this works, and add some comments ! And see too
+    #        if I shouldn't use "require instead of "use" (conditionnal ?)
     use File::Temp;
     use File::Copy;
 
-    my ($tempfh,$doc)=mkstempt("jasmine_XXXXXXXX", $ENV{"TMPDIR"});
-    
-    copy(\*STDIN, $tempfh);
-    
+    my ($tempfh,$doc) = mkstempt("jasmine_XXXXXXXX", $ENV{"TMPDIR"}) or do {
+      log_failure ("  Unable to create tempfile in $ENV{'TMPDIR'} : $!");
+      log_debug ("---> Ended at: ".strftime ("%a %b %e %H:%M:%S %Y", localtime));
+      closelog();
+      die "ERROR: $me: Could not create tempfile, check permissions or disk space";
+    };
+
     log_debug ("  Called with 5 args, \$doc is read from STDIN and the tempfile is $doc");
+
+    copy(\*STDIN, $tempfh) or do {
+      log_failure ("  Unable to write to $doc : $!");
+      log_debug ("---> Ended at: ".strftime ("%a %b %e %H:%M:%S %Y", localtime));
+      closelog();
+      die "ERROR: $me: Could not write to tempfile, check permissions or disk space";
+    };
   }
 
   # If called with 6 arguments, the 6th is the path of the file to print.
@@ -491,6 +502,7 @@ else {
   if ($Debug_Mode > 1) {
     # Developer mode : Keep all files inconditionally
     log_debug("Warning, developer mode on, tempfile not removed to enable investigation. Please clean $ENV{TMPDIR} manually !!!");
+    # use or require File::copy
     copy($doc,$ENV{"TMPDIR"}) if ($doc);
     $count_failure and log_failure(" Accounting failure : Whether the page accounting or the DB insert failed !");
   }
@@ -499,6 +511,7 @@ else {
     if ($count_failure) {
       log_failure(" Accounting failure : Whether the page accounting or the DB insert failed !");
       log_debug("Warning, tempfile not removed to enable investigation. Please clean $ENV{TMPDIR} manually !!!");
+      # use or require File::copy
       copy($doc,$ENV{"TMPDIR"}) if ($doc);
     }
     else {
