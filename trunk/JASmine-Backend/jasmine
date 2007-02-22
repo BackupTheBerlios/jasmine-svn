@@ -54,9 +54,9 @@ use strict;
 use POSIX qw(strftime);
 use File::Basename;
 use File::Copy;
+use File::Temp qw(tempfile);
 use Sys::Hostname;
-#use DBI;
-use DBD::mysql; #<= WORK ON THISSSSSSSss !!!!!
+use DBD::mysql;
 
 # Backend-related variables: Should not be changed if working !
 my $backends_dir = dirname($0);
@@ -304,7 +304,12 @@ if (@ARGV == 0){
     ## the owner and perms, as someone could have put a malware in the backend directory...
     ## Well, in fact, this is not our problem, as if someone manages to write there, he has
     ## already root access...
-    my @output = `$backend`;
+    my @output = `$backend` or do {
+      # TODO : Improve this message, as an error here indicates that backend
+      #        execution failed, often because of it missing libs, packages,
+      #        files, etc.
+      log_failure ("Could not poll backend $backend !");
+    };
 
     # A given backend may manage many devices, thus outputing many lines:
     # we process each line.
@@ -366,21 +371,22 @@ else {
   # This one is used for the temp file, if needeed.
   my $tmpfile;
 
-  # If we were called with 5 arguments, read from STDIN to a tempfile:
+  # If we were called with 5 arguments, the document is read
+  # from STDIN to a tempfile :
   if (@ARGV == 5){
     # TODO : Validate this works, and add some comments ! And see too
     #        if I shouldn't use "require instead of "use" (conditionnal ?)
-    use File::Temp;
-    use File::Copy;
+    
+#my $fh=tempfile("tmpfileXXXXX", DIR=>"/tmp/jas"); <=A ENLEVER !
 
-    my ($tempfh,$doc) = mkstempt("jasmine_XXXXXXXX", $ENV{"TMPDIR"}) or do {
+    my ($tempfh,$doc) = tempfile("jasmine_XXXXXXXX", DIR=>$ENV{"TMPDIR"}) or do {
       log_failure ("  Unable to create tempfile in $ENV{'TMPDIR'} : $!");
       log_debug ("---> Ended at: ".strftime ("%a %b %e %H:%M:%S %Y", localtime));
       closelog();
       die "ERROR: $me: Could not create tempfile, check permissions or disk space";
     };
 
-    log_debug ("  Called with 5 args, \$doc is read from STDIN and the tempfile is $doc");
+    log_debug ("  Called with 5 args, \$doc is read from STDIN to the tempfile $doc");
 
     copy(\*STDIN, $tempfh) or do {
       log_failure ("  Unable to write to $doc : $!");
@@ -388,24 +394,22 @@ else {
       closelog();
       die "ERROR: $me: Could not write to tempfile, check permissions or disk space";
     };
+    close $tempfh;
   }
 
   # If called with 6 arguments, the 6th is the path of the file to print.
   # TODO : Check if that *really* means that the file is raw data and we cannot
   #        count pages... And look if we really need to manage copies.
+  # TODO EN COURS !!!
   if (@ARGV == 6){
     $doc = $ARGV[5];
     chomp $doc;
     log_debug ("  Called with 6 args, \$doc is $doc");
   }
 
-  log_debug ("  Document: $doc");
-  # Sleep to have time to take a copy of the spooled file (For test purpose)
-  #sleep 60;
 
   # Extract arguments passed to us, to send them to the real backend.
-  # ...We gonna modify some of them. There may be better ways of doing this
-  # using 'unshift', 'push', etc...
+  # ...We gonna modify some of them.
   my ($job_id, $user, $title, $copies, $options, $file) = @ARGV;
 
   # So now we are able to count pages :
@@ -428,20 +432,75 @@ else {
   # We'll need the printer name later: Time to extract it from env
   my $printer=$ENV{PRINTER};
 
-  # Insert the real URI as the first argument to the real backend, so we can lie
-  # to him about his name (See the 'exec' manual), and modify/add the 'file'
-  # argument so that it points to our '$doc' file.
-  my @args = ($real_uri, $job_id, $user, $title, $copies, $options, $doc);
+  # Now, two possibilities depending on how we were called :
+  # * 5 args : We must call the real backend with 5 args too, and send
+  #   it the file on its STDIN
+  # * 6 args : We must call the real backend with 6 args, the last one
+  #   being the path to the file to print
+  #
+  # In either case, we must insert the real URI as the first argument
+  # to the real backend, so we can lie to him about his own name (See
+  # the 'exec' perl manual), 
 
-  # Time to execute the real backend...
-  my $backend_cmd = $backends_dir."/".$real_backend;
-  log_debug ("  Calling backend: $backend_cmd ".join(" ", @args));
-  system $backend_cmd @args;
+  # Return codes
+  my ($rcode, $crcode);
 
-  # At this point, our print job should have been finally processed.
-  # Check the return value to be sure that the subprocess launched correctly :
-  my $rcode = $?;
-  my $crcode = $rcode >> 8;
+  if (@ARGV == 5) {
+    
+    # The real backend will be called with this args, and the document
+    # flow through its STDIN
+    my @args = ($real_uri, $job_id, $user, $title, $copies, $options);
+
+    # pipe and fork
+    my $pid = open(CHILD, "|-");
+
+    if ($pid == -1) {
+      die "Fork error: $!";
+    }
+    if ($pid == 0) {
+    # Child process, running
+    my $backend_cmd = $backends_dir."/".$real_backend;
+    
+    # Time to run the real backend...
+    log_debug ("  Calling backend: exec $backend_cmd ".join(" ", @args));
+    exec $backend_cmd  @args or die "Exec error: $!";
+    
+    # At this point, our print job should have been finally processed.
+    # TODO Find a way to pass the return value to the parent !
+    #my $rcode = $?;
+    #my $crcode = $rcode >> 8;
+    log_debug ("(5 args) Child ended : ".strftime ("%a %b %e %H:%M:%S %Y", localtime));
+    }
+    else {
+      # Parent process : We stream the document to the child process
+      # TODO : Validate this works, and add some comments ! And move
+      #        the "use" at top of file.
+      use File::Temp;
+      use File::Copy;
+
+      copy($doc, \*STDIN) or do {
+        log_failure ("  Unable to write document to child process : $!");
+        log_debug ("---> Ended at: ".strftime ("%a %b %e %H:%M:%S %Y", localtime));
+        closelog();
+        die "ERROR: $me: Could not write to child process !";
+      };
+      log_debug ("(5 args) Parent copy() ended : ".strftime ("%a %b %e %H:%M:%S %Y", localtime));
+    }
+  }
+
+  if (@ARGV == 6) {
+    # TODO : FIX THIS COMMENT !
+    my @args = ($real_uri, $job_id, $user, $title, $copies, $options, $doc);
+
+    my $backend_cmd = $backends_dir."/".$real_backend;
+    log_debug ("  Calling backend: $backend_cmd ".join(" ", @args));
+    system $backend_cmd @args;
+
+    # At this point, our print job should have been finally processed.
+    # Check the return value to be sure that the subprocess launched correctly :
+    $rcode = $?;
+    $crcode = $rcode >> 8;
+  }
 
   if ($rcode == 0){
     # This contains the actual return value of the child process:
