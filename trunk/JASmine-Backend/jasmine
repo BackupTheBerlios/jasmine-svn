@@ -369,7 +369,7 @@ else {
   # This will contain the path to the file to print.
   my $doc;
   # This one is used for the temp file, if needeed.
-  my $tmpfile;
+  my $tempfh;
 
   # If we were called with 5 arguments, the document is read
   # from STDIN to a tempfile :
@@ -377,9 +377,7 @@ else {
     # TODO : Validate this works, and add some comments ! And see too
     #        if I shouldn't use "require instead of "use" (conditionnal ?)
     
-#my $fh=tempfile("tmpfileXXXXX", DIR=>"/tmp/jas"); <=A ENLEVER !
-
-    my ($tempfh,$doc) = tempfile("jasmine_XXXXXXXX", DIR=>$ENV{"TMPDIR"}) or do {
+    ($tempfh,$doc) = tempfile("jasmine_XXXXXXXX", DIR=>$ENV{"TMPDIR"}) or do {
       log_failure ("  Unable to create tempfile in $ENV{'TMPDIR'} : $!");
       log_debug ("---> Ended at: ".strftime ("%a %b %e %H:%M:%S %Y", localtime));
       closelog();
@@ -394,7 +392,9 @@ else {
       closelog();
       die "ERROR: $me: Could not write to tempfile, check permissions or disk space";
     };
-    close $tempfh;
+    # Do not close $tempfh now, it will be used later to output to the real
+    # backend !
+    #close $tempfh;
   }
 
   # If called with 6 arguments, the 6th is the path of the file to print.
@@ -455,21 +455,25 @@ else {
     my $pid = open(CHILD, "|-");
 
     if ($pid == -1) {
+      # Fork failed.
       die "Fork error: $!";
     }
+    
     if ($pid == 0) {
-    # Child process, running
-    my $backend_cmd = $backends_dir."/".$real_backend;
+      # Child process, running
+      my $backend_cmd = $backends_dir."/".$real_backend;
     
-    # Time to run the real backend...
-    log_debug ("  Calling backend: exec $backend_cmd ".join(" ", @args));
-    exec $backend_cmd  @args or die "Exec error: $!";
+      # Time to run the real backend...
+      log_debug ("  Calling backend: exec $backend_cmd ".join(" ", @args));
+      exec $backend_cmd  @args or die "Exec error: $!";
     
-    # At this point, our print job should have been finally processed.
-    # TODO Find a way to pass the return value to the parent !
-    #my $rcode = $?;
-    #my $crcode = $rcode >> 8;
-    log_debug ("(5 args) Child ended : ".strftime ("%a %b %e %H:%M:%S %Y", localtime));
+      # Code after this will never be executed due to exec()
+      
+      # At this point, our print job should have been finally processed.
+      # TODO Find a way to pass the return value to the parent !
+      #my $rcode = $?;
+      #my $crcode = $rcode >> 8;
+      #log_debug ("(5 args) Child ended : ".strftime ("%a %b %e %H:%M:%S %Y", localtime));
     }
     else {
       # Parent process : We stream the document to the child process
@@ -478,12 +482,16 @@ else {
       use File::Temp;
       use File::Copy;
 
-      copy($doc, \*STDIN) or do {
+      #copy($tempfh, \*CHILD) or do {
+      copy($doc, \*CHILD) or do {
         log_failure ("  Unable to write document to child process : $!");
         log_debug ("---> Ended at: ".strftime ("%a %b %e %H:%M:%S %Y", localtime));
         closelog();
         die "ERROR: $me: Could not write to child process !";
       };
+      
+      close $tempfh;
+      close CHILD;
       log_debug ("(5 args) Parent copy() ended : ".strftime ("%a %b %e %H:%M:%S %Y", localtime));
     }
   }
@@ -562,6 +570,7 @@ else {
     # Developer mode : Keep all files inconditionally
     log_debug("Warning, developer mode on, tempfile not removed to enable investigation. Please clean $ENV{TMPDIR} manually !!!");
     # use or require File::copy
+    # TODO : Check for copy() errors here, it empties tempfiles !
     copy($doc,$ENV{"TMPDIR"}) if ($doc);
     $count_failure and log_failure(" Accounting failure : Whether the page accounting or the DB insert failed !");
   }
@@ -574,11 +583,13 @@ else {
       copy($doc,$ENV{"TMPDIR"}) if ($doc);
     }
     else {
-      unlink $tmpfile if (defined $tmpfile);
+      # TODO : $doc instead ?
+      #unlink $tmpfile if (defined $tmpfile);
     }
   }
   else {
-    unlink $tmpfile if (defined $tmpfile);
+    # TODO : $doc instead ?
+    #unlink $tmpfile if (defined $tmpfile);
   }
 
   # Close log...
